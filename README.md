@@ -7,14 +7,14 @@ I'll be writing a "research paper" about my experience and my findings, hopefull
 In the meantime, I'll also be writing a dynamic PatchGuard bypass for modern Windows 10 systems.
 Hopefully when it's done it'll include 3 main features:
 
-## **Disable**
+### **Disable**
 Disables PatchGuard completely and prevents its execution.
 
-## **Evade** 
+### **Evade** 
 Evades PatchGuard detection by reverting patches prior to the PG check times.
 
-## **Verify**
+### **Verify**
 Checks if PatchGuard has been disabled on the system. Basically the opposite of Disabling.
 
-**The feature names are WIP, do not roast me for the poor choice <3**
+**DISCLAMER: The feature names are work-in-progress, do not roast me for the poor choice <3**
 
