@@ -2,7 +2,7 @@
 #include <ntifs.h>
 #include <ntddk.h>
 #include "Log.h"
-#include "timers/Timer.h"
+#include "PatchGuard.h"
 
 VOID
 DriverUnload(
@@ -10,30 +10,6 @@ DriverUnload(
 )
 {
     UNREFERENCED_PARAMETER(pDriverObject);
-}
-
-VOID
-PgDisabler(
-    PKTIMER Timer,
-    PKDPC DecodedDpc
-)
-{
-    if (!MmIsAddressValid(DecodedDpc))
-        return;
-
-    INT64 ShiftedCtx = (INT64) DecodedDpc->DeferredContext >> 47;
-
-    if (ShiftedCtx != 0 && ShiftedCtx != -1)
-    {
-        DbgBreakPoint();
-        Log("\nContext-Aware Timer/DPC: %p/%p\n", Timer, DecodedDpc);
-    }
-
-    if ((UINT64) DecodedDpc->DeferredRoutine == 0xfffff80323dd7330)
-    {
-        DbgBreakPoint();
-        Log("\nContext-Unaware Timer/DPC: %p/%p\n", Timer, DecodedDpc);
-    }
 }
 
 EXTERN_C
@@ -48,12 +24,7 @@ DriverEntry(
 
     DriverObject->DriverUnload = DriverUnload;
 
-    TimerCallbackArray callbacks;
-    callbacks.Append((PTIMER_CALLBACK) &PgDisabler);
-
-    Log("Starting %d\n", callbacks.Size());
-
-    IterateSystemTimers(callbacks);
+    PG::Disable::Execute();
 
     return STATUS_SUCCESS;
 }

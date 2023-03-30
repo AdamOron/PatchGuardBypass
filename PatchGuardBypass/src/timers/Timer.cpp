@@ -75,7 +75,7 @@ For each KTIMER, the given callback function is invoked.
 VOID
 IterateTimerList(
     PLIST_ENTRY TimerListHead,
-    TimerCallbackArray &TimerCallbacks
+    PTIMER_CALLBACK TimerCallback
 )
 {
     PLIST_ENTRY pListEntry = TimerListHead->Flink;
@@ -93,9 +93,8 @@ IterateTimerList(
         /* Get the decoded DPC */
         PKDPC pDpc = DECODE_TIMER_DPC(pTimer);
 
-        /* Invoke all registered callbacks */
-        for (unsigned long i = 0; i < TimerCallbacks.Size(); i++)
-            TimerCallbacks.Get(i)(pTimer, pDpc);
+        /* Invoke registered callback */
+        TimerCallback(pTimer, pDpc);
 
         /* Advance to the next Timer entry */
         pListEntry = pListEntry->Flink;
@@ -110,7 +109,7 @@ Iterates all pending KTIMERs in the given KTIMER_TABLE.
 VOID
 IterateTimerTable(
     PKTIMER_TABLE TimerTable,
-    TimerCallbackArray &TimerCallbacks
+    PTIMER_CALLBACK TimerCallback
 )
 {
     /* Get the array of kernel-mode KTIMER_TABLE_ENTRYs */
@@ -119,11 +118,11 @@ IterateTimerTable(
     PKTIMER_TABLE_ENTRY pUserEntries = TimerTable->TimerEntries[UserMode];
 
     /* Iterate over all KTIMER_TABLE_ENTRYs in both arrays */
-    for (int i = 0; i < TIMER_ENTRIES_SIZE; i++)
+    for (USHORT i = 0; i < TIMER_ENTRIES_SIZE; i++)
     {
         /* Iterate linked-list of KTIMERs within each KTIMER_TABLE_ENTRY */
-        IterateTimerList(&pKernelEntries[i].Entry, TimerCallbacks);
-        IterateTimerList(&pUserEntries[i].Entry, TimerCallbacks);
+        IterateTimerList(&pKernelEntries[i].Entry, TimerCallback);
+        IterateTimerList(&pUserEntries[i].Entry, TimerCallback);
     }
 }
 
@@ -135,7 +134,7 @@ Iterates over all Timers in the system, invokes the given callbacks for each Tim
 */
 BOOLEAN
 IterateSystemTimers(
-    TimerCallbackArray &TimerCallbacks
+    PTIMER_CALLBACK TimerCallback
 )
 {
     /* For every processor in the system */
@@ -148,7 +147,7 @@ IterateSystemTimers(
             return FALSE;
 
         /* Get the KPRCB's TimerTable, then iterate its Timers */
-        IterateTimerTable(GetTimerTable(pPrcb), TimerCallbacks);
+        IterateTimerTable(GetTimerTable(pPrcb), TimerCallback);
     }
 
     return TRUE;

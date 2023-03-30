@@ -8,50 +8,44 @@ KTIMER, *PKTIMER;
 typedef struct _KDPC
 KDPC, *PKDPC;
 
+/**
+Contains sub-namespaces defining each execution flow for PatchGuard checks.
+*/
 namespace Flows
 {
+	/**
+	PatchGuard issues a check through a Timer inserted to Prcb index 0.
+	This Timer receives the PatchGuard Context struct as a parameter and uses it.
+	*/
 	namespace ContextAwareTimer
 	{
-		typedef struct _STATE
-		STATE, *PSTATE;
-
-		PSTATE
-		GetState(
-			VOID
-		);
-
-		VOID
-		GetTargetTimer(
+		BOOLEAN
+		IsTargetTimer(
 			PKTIMER Timer,
 			PKDPC DecodedDpc
 		);
 	};
 
+	/**
+	PatchGuard issues a check through a Timer inserted to Prcb index 0.
+	This Timer does not receive the PatchGuard Context struct as a parameter.
+	It is more static & less complex than the context aware Timer.
+	*/
 	namespace ContextUnawareTimer
 	{
-		typedef struct _STATE
-		STATE, *PSTATE;
-
-		PSTATE
-		GetState(
-			VOID
-		);
-
-		VOID
-		GetTargetTimer(
+		BOOLEAN
+		IsTargetTimer(
 			PKTIMER Timer,
 			PKDPC DecodedDpc
 		);
 	};
 
+	/**
+	PatchGuad issues a check through a DPC saved to Prcb index 0.
+	This DPC is inserted to the HalReserved[7] field from FsRtlMdlReadCompleteDevEx.
+	It is executed every 2 minutes from HalpMcaQueueDpc.
+	*/
 	namespace PrcbDpc
 	{
-		typedef struct _STATE
-		STATE, *PSTATE;
-
-		PSTATE
-		GetState(
-			VOID
-		);
 	};
 };

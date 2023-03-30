@@ -1,5 +1,4 @@
 #pragma once
-#include "../utils/FixedArray.h"
 #include <ntdef.h>
 
 /* Forward declaration of KTIMER struct */
@@ -22,15 +21,10 @@ TIMER_CALLBACK(
 );
 typedef TIMER_CALLBACK *PTIMER_CALLBACK;
 
-/* Typedef for a fixed array of TIMER_CALLBACK routines */
-#define MAX_TIMER_CALLBACKS 10
-typedef FixedArray<PTIMER_CALLBACK, MAX_TIMER_CALLBACKS> TimerCallbackArray;
-
 /**
 Iterates over all Timers in the system, invokes the given callbacks for each Timer.
-@param TimerCallbacks is the fixed array of callbacks to be invoked.
 */
 BOOLEAN
 IterateSystemTimers(
-    TimerCallbackArray &TimerCallbacks
+    PTIMER_CALLBACK TimerCallback
 );

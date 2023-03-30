@@ -1,4 +1,3 @@
-#pragma once
 #include "Log.h"
 #include <stdarg.h>
 #include <ntddk.h>
