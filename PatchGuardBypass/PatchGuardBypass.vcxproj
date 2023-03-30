@@ -148,6 +148,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Disable.cpp" />
+    <ClCompile Include="src\Evade.cpp" />
+    <ClCompile Include="src\Flows.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\timers\Timer.cpp" />
@@ -157,7 +159,6 @@
     <ClInclude Include="src\Log.h" />
     <ClInclude Include="src\PatchGuard.h" />
     <ClInclude Include="src\timers\Timer.h" />
-    <ClInclude Include="src\utils\FixedArray.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
