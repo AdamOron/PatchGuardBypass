@@ -1,4 +1,8 @@
 #pragma once
 #include <ntdef.h>
 
-ULONG Log(PCSTR format, ...);
+ULONG
+Log(
+	PCSTR format,
+	...
+);

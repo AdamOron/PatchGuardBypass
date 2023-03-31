@@ -2,7 +2,11 @@
 #include <stdarg.h>
 #include <ntddk.h>
 
-ULONG Log(PCSTR format, ...)
+ULONG
+Log(
+    PCSTR format,
+    ...
+)
 {
     va_list args;
     va_start(args, format);

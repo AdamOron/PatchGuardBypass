@@ -33,7 +33,9 @@ EVADE_CONTEXT g_EvadeContext = { 0 };
 
 inline
 VOID
-InsertTimerToContext(PKTIMER Timer)
+InsertTimerToContext(
+    PKTIMER Timer
+)
 {
     if (g_EvadeContext.TimerCount >= MAX_PG_TIMERS)
     {
@@ -44,7 +46,7 @@ InsertTimerToContext(PKTIMER Timer)
     g_EvadeContext.Timers[g_EvadeContext.TimerCount++] = Timer;
 }
 
-inline
+FORCEINLINE
 BOOLEAN
 TimerOverflow(
     VOID
@@ -92,6 +94,7 @@ UpdateTimers(
 
 ULONGLONG
 GetEarliestTimer(
+    VOID
 )
 {
     ULONGLONG earliestTime = MAXLONGLONG;
