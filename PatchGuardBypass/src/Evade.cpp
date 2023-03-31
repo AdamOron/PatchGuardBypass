@@ -59,7 +59,7 @@ TimerOverflow(
 For each Timer encountered, checks if it's PG related and saves it if so.
 Compatible with the TIMER_CALLBACK signature, passed to IterateSystemTimers.
 */
-VOID
+TIMER_SEARCH_STATUS
 FindTimer(
     PKTIMER Timer,
     PKDPC DecodedDpc
@@ -74,6 +74,8 @@ FindTimer(
     {
         InsertTimerToContext(Timer);
     }
+
+    return ContinueTimerSearch;
 }
 
 BOOLEAN

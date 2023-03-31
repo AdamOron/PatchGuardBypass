@@ -17,7 +17,7 @@ VERIFY_CONTEXT g_VerifyContext = { FALSE };
 For each Timer encountered, checks if it's PG related and removes it if so.
 Compatible with the TIMER_CALLBACK signature, passed to IterateSystemTimers.
 */
-VOID
+TIMER_SEARCH_STATUS
 VerifyTimer(
     PKTIMER Timer,
     PKDPC DecodedDpc
@@ -32,6 +32,8 @@ VerifyTimer(
     {
         g_VerifyContext.bContextUnawareTimer = TRUE;
     }
+
+    return ContinueTimerSearch;
 }
 
 BOOLEAN

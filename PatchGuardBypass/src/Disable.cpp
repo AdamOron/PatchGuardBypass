@@ -8,8 +8,8 @@
 For each Timer encountered, checks if it's PG related and removes it if so.
 Compatible with the TIMER_CALLBACK signature, passed to IterateSystemTimers.
 */
-VOID
-VerifyTimer(
+TIMER_SEARCH_STATUS
+RemoveTimer(
 	PKTIMER Timer,
 	PKDPC DecodedDpc
 )
@@ -27,6 +27,8 @@ VerifyTimer(
 
         Log("\nRemoved Context-Unaware Timer/DPC: %p/%p\n", Timer, DecodedDpc);
     }
+
+    return ContinueTimerSearch;
 }
 
 BOOLEAN
@@ -35,7 +37,7 @@ PG::Disable::Execute(
 )
 {
     /* Disable all PG related Timers */
-    IterateSystemTimers(&VerifyTimer);
+    IterateSystemTimers(&RemoveTimer);
 
     /* Flows::PrcbDpc:: */
 

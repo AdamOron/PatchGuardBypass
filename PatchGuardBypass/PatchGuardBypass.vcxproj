@@ -153,6 +153,7 @@
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\timers\Timer.cpp" />
+    <ClCompile Include="src\Verify.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Flows.h" />

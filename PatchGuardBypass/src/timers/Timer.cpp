@@ -51,9 +51,16 @@ GetTimerTable(
     return (PKTIMER_TABLE) ((char *) Prcb + TIMER_TABLE_OFFSET);
 }
 
+/*
+The following values are just magic numbers that are valid for a specific snapshot I have.
+Once a proper Symbol Manager is introduced, we'll be able to easily get the actual values of these
+*/
+
 /* Keys used for decoding/encoding DPCs within KTIMERs */
 INT64 KiWaitAlways = 0x007ec1055bfd1db0;
 INT64 KiWaitNever = 0xe8e7003f609ce7e4;
+/* Number of processor on the system. Also indicates number of PRCBs */
+ULONG KeNumberProcessors_0 = 4;
 
 /*
 Returns the decoded pointer to the DPC stored in a KTIMER structre.
@@ -71,8 +78,9 @@ Iterates over all entries of a linked-list of KTIMERs.
 For each KTIMER, the given callback function is invoked.
 @param TimerListHead is the head entry of the list, from a KTIMER_TABLE_ENTRY structure.
 @param TimerCallbacks is a fixed array of TIMER_CALLBACK routines, invoked for each KTIMER.
+@return search instructions for the caller.
 */
-VOID
+TIMER_SEARCH_STATUS
 IterateTimerList(
     PLIST_ENTRY TimerListHead,
     PTIMER_CALLBACK TimerCallback
@@ -94,11 +102,14 @@ IterateTimerList(
         PKDPC pDpc = DECODE_TIMER_DPC(pTimer);
 
         /* Invoke registered callback */
-        TimerCallback(pTimer, pDpc);
+        if (TimerCallback(pTimer, pDpc) == StopTimerSearch)
+            return StopTimerSearch;
 
         /* Advance to the next Timer entry */
         pListEntry = pListEntry->Flink;
     }
+
+    return ContinueTimerSearch;
 }
 
 /**
@@ -121,12 +132,14 @@ IterateTimerTable(
     for (USHORT i = 0; i < TIMER_ENTRIES_SIZE; i++)
     {
         /* Iterate linked-list of KTIMERs within each KTIMER_TABLE_ENTRY */
-        IterateTimerList(&pKernelEntries[i].Entry, TimerCallback);
-        IterateTimerList(&pUserEntries[i].Entry, TimerCallback);
+
+        if (IterateTimerList(&pKernelEntries[i].Entry, TimerCallback) == StopTimerSearch)
+            break;
+
+        if (IterateTimerList(&pUserEntries[i].Entry, TimerCallback) == StopTimerSearch)
+            break;
     }
 }
-
-ULONG KeNumberProcessors_0 = 4;
 
 /**
 Iterates over all Timers in the system, invokes the given callbacks for each Timer.
