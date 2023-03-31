@@ -1,8 +1,8 @@
 #pragma once
 #include <ntifs.h>
 #include <ntddk.h>
-#include "Log.h"
-#include "PatchGuard.h"
+#include "utils/Log.h"
+#include "core/PatchGuard.h"
 
 VOID
 DriverUnload(

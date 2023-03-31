@@ -2,7 +2,7 @@
 #include "Timer.h"
 #include <ntifs.h>
 #include <ntddk.h>
-#include "../Log.h"
+#include "../../utils/Log.h"
 
 /**
 * Kernel structure defining an entry within a KTIMER_TABLE.

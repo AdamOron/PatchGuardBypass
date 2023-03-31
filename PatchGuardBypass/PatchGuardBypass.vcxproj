@@ -147,19 +147,19 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Disable.cpp" />
-    <ClCompile Include="src\Evade.cpp" />
-    <ClCompile Include="src\Flows.cpp" />
-    <ClCompile Include="src\Log.cpp" />
+    <ClCompile Include="src\core\features\Disable.cpp" />
+    <ClCompile Include="src\core\features\Evade.cpp" />
+    <ClCompile Include="src\core\flows\Flows.cpp" />
+    <ClCompile Include="src\utils\Log.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\timers\Timer.cpp" />
-    <ClCompile Include="src\Verify.cpp" />
+    <ClCompile Include="src\core\timers\Timer.cpp" />
+    <ClCompile Include="src\core\features\Verify.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Flows.h" />
-    <ClInclude Include="src\Log.h" />
-    <ClInclude Include="src\PatchGuard.h" />
-    <ClInclude Include="src\timers\Timer.h" />
+    <ClInclude Include="src\core\flows\Flows.h" />
+    <ClInclude Include="src\utils\Log.h" />
+    <ClInclude Include="src\core\PatchGuard.h" />
+    <ClInclude Include="src\core\timers\Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

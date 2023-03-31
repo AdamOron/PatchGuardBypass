@@ -1,7 +1,7 @@
-#include "PatchGuard.h"
-#include "timers/Timer.h"
-#include "Flows.h"
-#include "Log.h"
+#include "../PatchGuard.h"
+#include "../timers/Timer.h"
+#include "../flows/Flows.h"
+#include "../../utils/Log.h"
 #include <ntddk.h>
 
 typedef struct _VERIFY_CONTEXT

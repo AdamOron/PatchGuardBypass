@@ -27,36 +27,36 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Log.cpp">
+    <ClCompile Include="src\utils\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\timers\Timer.cpp">
+    <ClCompile Include="src\core\timers\Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Disable.cpp">
+    <ClCompile Include="src\core\features\Disable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Flows.cpp">
+    <ClCompile Include="src\core\flows\Flows.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Evade.cpp">
+    <ClCompile Include="src\core\features\Evade.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Verify.cpp">
+    <ClCompile Include="src\core\features\Verify.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Log.h">
+    <ClInclude Include="src\utils\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\timers\Timer.h">
+    <ClInclude Include="src\core\timers\Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\PatchGuard.h">
+    <ClInclude Include="src\core\PatchGuard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Flows.h">
+    <ClInclude Include="src\core\flows\Flows.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
