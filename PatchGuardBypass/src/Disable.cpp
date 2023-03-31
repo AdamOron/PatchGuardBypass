@@ -41,3 +41,11 @@ PG::Disable::Execute(
 
     return TRUE;
 }
+
+VOID
+PG::Disable::Unload(
+    VOID
+)
+{
+    /* Nothing to do here */
+}

@@ -268,3 +268,13 @@ PG::Evade::Execute(
 
     return TRUE;
 }
+
+VOID
+PG::Evade::Unload(
+    VOID
+)
+{
+    /* Cancel current Timers */
+    KeCancelTimer(&g_EvadeContext.StartEvasionTimer);
+    KeCancelTimer(&g_EvadeContext.StopEvasionTimer);
+}

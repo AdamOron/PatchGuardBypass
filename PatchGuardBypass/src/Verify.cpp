@@ -35,7 +35,7 @@ VerifyTimer(
 }
 
 BOOLEAN
-PG::Disable::Execute(
+PG::Verify::Execute(
     VOID
 )
 {
@@ -46,4 +46,12 @@ PG::Disable::Execute(
         g_VerifyContext.bContextAwareTimer &&
         g_VerifyContext.bContextUnawareTimer &&
         g_VerifyContext.bPrcbDpc;
+}
+
+VOID
+PG::Verify::Unload(
+    VOID
+)
+{
+    /* Nothing to do here */
 }

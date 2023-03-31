@@ -9,6 +9,11 @@ namespace PG
 		Execute(
 			VOID
 		);
+
+		VOID
+		Unload(
+			VOID
+		);
 	};
 
 	namespace Evade
@@ -17,12 +22,22 @@ namespace PG
 		Execute(
 			VOID
 		);
+
+		VOID
+		Unload(
+			VOID
+		);
 	};
 
 	namespace Verify
 	{
 		BOOLEAN
 		Execute(
+			VOID
+		);
+
+		VOID
+		Unload(
 			VOID
 		);
 	};
