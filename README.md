@@ -1,11 +1,11 @@
 # **PatchGuardBypass**
 
-I've had the delightful opportunity to research PatchGuard for the past couple of weeks. It was fun at times.
+I've had the delightful opportunity to research PatchGuard for the past couple of weeks, and it was mostly pretty fun.
 
-I'll be writing a "research paper" about my experience and my findings, hopefully it could help anyone else who's hesitant to do something like this :)
+I'll be writing a paper about my experience and my findings, hopefully it could help anyone else who's hesitant to do something like this :)
 
-In the meantime, I'll also be writing a dynamic PatchGuard bypass for modern Windows 10 systems.
-Hopefully when it's done it'll include 3 main features:
+In the meantime, I'll also be writing a dynamic PatchGuard bypass for modern Windows 10 systems. This is still a bit far from done, so please don't expect anything to work at this stage.
+Hopefully when it is finished it'll include 3 main features:
 
 ### **Disable**
 Disables PatchGuard completely and prevents its execution.

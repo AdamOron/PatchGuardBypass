@@ -86,7 +86,7 @@ UpdateTimers(
     /* Reset all previously found Timers */
     g_EvadeContext.TimerCount = 0;
     /* Find all PG related Timers */
-    IterateSystemTimers(&FindTimer);
+    SearchSystemTimers(&FindTimer);
 
     if (TimerOverflow())
         return FALSE;

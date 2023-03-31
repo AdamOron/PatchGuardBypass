@@ -81,15 +81,19 @@ For each KTIMER, the given callback function is invoked.
 @return search instructions for the caller.
 */
 TIMER_SEARCH_STATUS
-IterateTimerList(
-    PLIST_ENTRY TimerListHead,
+SearchTimerList(
+    PKTIMER_TABLE_ENTRY TimerTableEntry,
     PTIMER_CALLBACK TimerCallback
 )
 {
-    PLIST_ENTRY pListEntry = TimerListHead->Flink;
+    /*
+    TODO: Acquire & Release SpinLock of TimerTableEntry.
+    */
+
+    PLIST_ENTRY pListEntry = TimerTableEntry->Entry.Flink;
 
     /* As long as the current entry is valid and we haven't reached the end */
-    while (pListEntry && pListEntry != TimerListHead)
+    while (pListEntry && pListEntry != &TimerTableEntry->Entry)
     {
         /* Get the KTIMER that contains the current list entry */
         PKTIMER pTimer = CONTAINING_RECORD(
@@ -118,7 +122,7 @@ Iterates all pending KTIMERs in the given KTIMER_TABLE.
 @param TimerCallbacks is a fixed array of TIMER_CALLBACK routines, invoked for each KTIMER.
 */
 VOID
-IterateTimerTable(
+SearchTimerTable(
     PKTIMER_TABLE TimerTable,
     PTIMER_CALLBACK TimerCallback
 )
@@ -133,10 +137,10 @@ IterateTimerTable(
     {
         /* Iterate linked-list of KTIMERs within each KTIMER_TABLE_ENTRY */
 
-        if (IterateTimerList(&pKernelEntries[i].Entry, TimerCallback) == StopTimerSearch)
+        if (SearchTimerList(&pKernelEntries[i], TimerCallback) == StopTimerSearch)
             break;
 
-        if (IterateTimerList(&pUserEntries[i].Entry, TimerCallback) == StopTimerSearch)
+        if (SearchTimerList(&pUserEntries[i], TimerCallback) == StopTimerSearch)
             break;
     }
 }
@@ -146,21 +150,21 @@ Iterates over all Timers in the system, invokes the given callbacks for each Tim
 @param TimerCallbacks is the fixed array of callbacks to be invoked.
 */
 BOOLEAN
-IterateSystemTimers(
+SearchSystemTimers(
     PTIMER_CALLBACK TimerCallback
 )
 {
     /* For every processor in the system */
     for (ULONG i = 0; i < KeNumberProcessors_0; i++)
     {
-        /* Get the matching KPRCB struct */
+        /* Get the matching KPRCB struct (current code is wrong, just a placeholder) */
         PKPRCB pPrcb = KeGetPcr()->CurrentPrcb;
 
         if (!pPrcb)
             return FALSE;
 
         /* Get the KPRCB's TimerTable, then iterate its Timers */
-        IterateTimerTable(GetTimerTable(pPrcb), TimerCallback);
+        SearchTimerTable(GetTimerTable(pPrcb), TimerCallback);
     }
 
     return TRUE;

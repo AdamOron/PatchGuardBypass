@@ -35,6 +35,6 @@ typedef TIMER_CALLBACK *PTIMER_CALLBACK;
 Iterates over all Timers in the system, invokes the given callbacks for each Timer.
 */
 BOOLEAN
-IterateSystemTimers(
+SearchSystemTimers(
     PTIMER_CALLBACK TimerCallback
 );

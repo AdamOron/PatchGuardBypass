@@ -16,14 +16,14 @@ RemoveTimer(
 {
     if (Flows::ContextAwareTimer::IsTargetTimer(Timer, DecodedDpc))
     {
-        RemoveEntryList(&Timer->TimerListEntry);
+        KeCancelTimer(Timer);
 
         Log("\nRemoved Context-Aware Timer/DPC: %p/%p\n", Timer, DecodedDpc);
     }
 
     if (Flows::ContextUnawareTimer::IsTargetTimer(Timer, DecodedDpc))
     {
-        RemoveEntryList(&Timer->TimerListEntry);
+        KeCancelTimer(Timer);
 
         Log("\nRemoved Context-Unaware Timer/DPC: %p/%p\n", Timer, DecodedDpc);
     }
@@ -37,7 +37,7 @@ PG::Disable::Execute(
 )
 {
     /* Disable all PG related Timers */
-    IterateSystemTimers(&RemoveTimer);
+    SearchSystemTimers(&RemoveTimer);
 
     /* Flows::PrcbDpc:: */
 

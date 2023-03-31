@@ -42,7 +42,7 @@ PG::Verify::Execute(
 )
 {
     /* Verify all PG related Timers exist */
-    IterateSystemTimers(&VerifyTimer);
+    SearchSystemTimers(&VerifyTimer);
 
     return
         g_VerifyContext.bContextAwareTimer &&
