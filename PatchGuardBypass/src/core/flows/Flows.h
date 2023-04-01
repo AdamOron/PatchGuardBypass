@@ -47,5 +47,22 @@ namespace Flows
 	*/
 	namespace PrcbDpc
 	{
+		/**
+		@return The next execution time of the DPC stored in the Prcb.
+		This value is returned as an interrupt timestamp.
+		*/
+		ULONG
+		NextExecutionTime(
+			VOID
+		);
+
+		/**
+		@return Pointer to the target DPC stored in the Prcb.
+		This returns a pointer to allow easily overwriting the DPC.
+		*/
+		PKDPC *
+		GetTargetDpc(
+			VOID
+		);
 	};
 };

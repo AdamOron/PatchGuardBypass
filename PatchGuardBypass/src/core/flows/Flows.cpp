@@ -29,7 +29,29 @@ Flows::ContextUnawareTimer::IsTargetTimer(
 
 	/*
 	This magic number is the address of CcBcbProfiler on a snapshot I'm using.
-	I'll update this in the future when I set up a proper Symbol system.
+	TODO: Get this from Symbol manager, when there is one.
 	*/
 	return (UINT64) DecodedDpc->DeferredRoutine == 0xfffff80323dd7330;
+}
+
+ULONG
+Flows::PrcbDpc::NextExecutionTime(
+	VOID
+)
+{
+	/* TODO: Get this from Symbol manager, when there is one */
+	UINT32 *HalpClockTimer = (UINT32 *) 0x1;
+	/* Offset 0x3C from HalpClockTimer */
+	return HalpClockTimer[0xF];
+}
+
+PKDPC *
+Flows::PrcbDpc::GetTargetDpc(
+	VOID
+)
+{
+	/* TODO: Get this from Symbol manager, when there is one */
+	PKDPC *Prcb = (PKDPC *) 0x1;
+	/* Offset 0x80 from first Prcb */
+	return &Prcb[0x10];
 }
