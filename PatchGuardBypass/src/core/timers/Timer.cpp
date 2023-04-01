@@ -57,8 +57,8 @@ Once a proper Symbol Manager is introduced, we'll be able to easily get the actu
 */
 
 /* Keys used for decoding/encoding DPCs within KTIMERs */
-INT64 KiWaitAlways = 0x007ec1055bfd1db0;
-INT64 KiWaitNever = 0xe8e7003f609ce7e4;
+INT64 KiWaitAlways = 0x57e6481841f5d803;
+INT64 KiWaitNever = 0x1dee9306afcf88ac;
 /* Number of processor on the system. Also indicates number of PRCBs */
 ULONG KeNumberProcessors_0 = 4;
 

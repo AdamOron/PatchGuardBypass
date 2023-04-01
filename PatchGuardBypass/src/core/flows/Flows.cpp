@@ -27,5 +27,9 @@ Flows::ContextUnawareTimer::IsTargetTimer(
 	if (!MmIsAddressValid(DecodedDpc))
 		return FALSE;
 
+	/*
+	This magic number is the address of CcBcbProfiler on a snapshot I'm using.
+	I'll update this in the future when I set up a proper Symbol system.
+	*/
 	return (UINT64) DecodedDpc->DeferredRoutine == 0xfffff80323dd7330;
 }

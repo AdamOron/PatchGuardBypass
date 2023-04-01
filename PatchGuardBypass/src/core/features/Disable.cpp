@@ -6,7 +6,7 @@
 
 /**
 For each Timer encountered, checks if it's PG related and removes it if so.
-Compatible with the TIMER_CALLBACK signature, passed to IterateSystemTimers.
+Compatible with the TIMER_CALLBACK signature, passed to SearchSystemTimers.
 */
 TIMER_SEARCH_STATUS
 RemoveTimer(
@@ -18,14 +18,14 @@ RemoveTimer(
     {
         KeCancelTimer(Timer);
 
-        Log("\nRemoved Context-Aware Timer/DPC: %p/%p\n", Timer, DecodedDpc);
+        Log("Removed Context-Aware Timer/DPC: %p/%p\n", Timer, DecodedDpc);
     }
 
     if (Flows::ContextUnawareTimer::IsTargetTimer(Timer, DecodedDpc))
     {
         KeCancelTimer(Timer);
 
-        Log("\nRemoved Context-Unaware Timer/DPC: %p/%p\n", Timer, DecodedDpc);
+        Log("Removed Context-Unaware Timer/DPC: %p/%p\n", Timer, DecodedDpc);
     }
 
     return ContinueTimerSearch;

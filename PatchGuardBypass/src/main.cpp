@@ -24,6 +24,7 @@ DriverEntry(
 
     DriverObject->DriverUnload = DriverUnload;
 
+    Log("Starting: %p\n", KeGetPcr()->CurrentPrcb);
     PG::Disable::Execute();
 
     return STATUS_SUCCESS;

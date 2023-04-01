@@ -15,11 +15,16 @@ This is the term for Windows interrupt time units.
 /* StopTimer cooldown after initial expiry (Period parameter) */
 #define STOP_COOLOWN 500
 
+/**
+Global context for the evasion feature.
+*/
 typedef struct _EVADE_CONTEXT
 {
+    /* Array of KTIMER */
 #define MAX_PG_TIMERS 10
     PKTIMER Timers[MAX_PG_TIMERS];
     UINT32 TimerCount;
+
     ULONGLONG CurrentTimer;
 
     KDPC StartEvasionDpc;
@@ -31,7 +36,6 @@ typedef struct _EVADE_CONTEXT
 
 EVADE_CONTEXT g_EvadeContext = { 0 };
 
-inline
 VOID
 InsertTimerToContext(
     PKTIMER Timer
