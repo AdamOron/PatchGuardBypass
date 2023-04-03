@@ -1,4 +1,3 @@
-#pragma once
 #include "Timer.h"
 #include <ntifs.h>
 #include <ntddk.h>
