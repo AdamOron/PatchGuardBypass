@@ -1,7 +1,7 @@
 #pragma once
 #include <ntifs.h>
 #include <ntddk.h>
-#include "utils/Log.h"
+#include "utils/log/Log.h"
 #include "core/PatchGuard.h"
 
 VOID
@@ -11,6 +11,8 @@ DriverUnload(
 {
     UNREFERENCED_PARAMETER(pDriverObject);
 }
+
+#include "core/symbols/Globals.h"
 
 EXTERN_C
 NTSTATUS
@@ -24,8 +26,11 @@ DriverEntry(
 
     DriverObject->DriverUnload = DriverUnload;
 
-    Log("Starting: %p\n", KeGetPcr()->CurrentPrcb);
+    Globals::Initialize();
+
     PG::Disable::Execute();
+
+    Log("%p\n", Globals::Functions::CcBcbProfiler);
 
     return STATUS_SUCCESS;
 }

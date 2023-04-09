@@ -1,5 +1,7 @@
 #include "Flows.h"
 #include <ntddk.h>
+#include "../symbols/Globals.h"
+#include "../symbols/Offsets.h"
 
 BOOLEAN
 Flows::ContextAwareTimer::IsTargetTimer(
@@ -27,11 +29,7 @@ Flows::ContextUnawareTimer::IsTargetTimer(
 	if (!MmIsAddressValid(DecodedDpc))
 		return FALSE;
 
-	/*
-	This magic number is the address of CcBcbProfiler on a snapshot I'm using.
-	TODO: Get this from Symbol manager, when there is one.
-	*/
-	return (UINT64) DecodedDpc->DeferredRoutine == 0xfffff80323dd7330;
+	return DecodedDpc->DeferredRoutine == Globals::Functions::CcBcbProfiler;
 }
 
 ULONG
@@ -39,10 +37,7 @@ Flows::PrcbDpc::NextExecutionTime(
 	VOID
 )
 {
-	/* TODO: Get this from Symbol manager, when there is one */
-	UINT32 *HalpClockTimer = (UINT32 *) 0x1;
-	/* Offset 0x3C from HalpClockTimer */
-	return HalpClockTimer[0xF];
+	return *reinterpret_cast<PULONG>((PBYTE) *Globals::Variables::HalpClockTimer + Offsets::HalpClockTimer::NextExecutionTime);
 }
 
 PKDPC *
@@ -50,8 +45,10 @@ Flows::PrcbDpc::GetTargetDpc(
 	VOID
 )
 {
-	/* TODO: Get this from Symbol manager, when there is one */
-	PKDPC *Prcb = (PKDPC *) 0x1;
-	/* Offset 0x80 from first Prcb */
-	return &Prcb[0x10];
+	PKPRCB Prcb = Globals::Functions::KeGetPrcb(0);
+	
+	if (!Prcb)
+		return NULL;
+
+	return reinterpret_cast<PKDPC *>((PBYTE) Prcb + Offsets::Prcb::PatchGuardDpc);
 }

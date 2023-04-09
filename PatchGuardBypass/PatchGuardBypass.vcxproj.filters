@@ -27,7 +27,7 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\utils\Log.cpp">
+    <ClCompile Include="src\utils\log\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\core\timers\Timer.cpp">
@@ -45,9 +45,15 @@
     <ClCompile Include="src\core\features\Verify.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\core\symbols\Globals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\symbols\Offsets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\utils\Log.h">
+    <ClInclude Include="src\utils\log\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core\timers\Timer.h">
@@ -57,6 +63,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core\flows\Flows.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\symbols\Offsets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\symbols\Globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,7 +1,8 @@
 #include "Timer.h"
 #include <ntifs.h>
 #include <ntddk.h>
-#include "../../utils/Log.h"
+#include "../symbols/Offsets.h"
+#include "../symbols/Globals.h"
 
 /**
 * Kernel structure defining an entry within a KTIMER_TABLE.
@@ -35,41 +36,25 @@ typedef struct _KTIMER_TABLE
     char TableState[0x18]; 
 } KTIMER_TABLE, *PKTIMER_TABLE;
 
-/* The Kernel KPRCB structure is undocumented, so we'll treat it as a void-pointer */
-typedef PVOID PKPRCB;
-
-/* The known offset to the TimerTable field within a KPRCB */
-#define TIMER_TABLE_OFFSET 0x3940
-
 /* Retrieves the TimerTable field of a KPRCB */
 PKTIMER_TABLE
 GetTimerTable(
     PKPRCB Prcb
 )
 {
-    return (PKTIMER_TABLE) ((char *) Prcb + TIMER_TABLE_OFFSET);
+    return (PKTIMER_TABLE) ((PCHAR) Prcb + Offsets::Prcb::TimerTable);
 }
-
-/*
-The following values are just magic numbers that are valid for a specific snapshot I have.
-Once a proper Symbol Manager is introduced, we'll be able to easily get the actual values of these
-*/
-
-/* Keys used for decoding/encoding DPCs within KTIMERs */
-INT64 KiWaitAlways = 0x57e6481841f5d803;
-INT64 KiWaitNever = 0x1dee9306afcf88ac;
-/* Number of processor on the system. Also indicates number of PRCBs */
-ULONG KeNumberProcessors_0 = 4;
 
 /*
 Returns the decoded pointer to the DPC stored in a KTIMER structre.
 These DPC pointers are encoded during insertion of the Timers.
+The encoding/decoding can be seen in KTIMER-related functions in ntoskrnl.exe.
 */
 #define DECODE_TIMER_DPC(Timer) \
-    (PKDPC) (KiWaitAlways ^ _byteswap_uint64( \
+    (PKDPC) (*Globals::Variables::KiWaitAlways ^ _byteswap_uint64( \
         (UINT64) Timer ^ _rotl64( \
-            (INT64) Timer->Dpc ^ KiWaitNever, \
-            (UCHAR) KiWaitNever \
+            (INT64) Timer->Dpc ^ *Globals::Variables::KiWaitNever, \
+            (UCHAR) *Globals::Variables::KiWaitNever \
         )))
 
 /** 
@@ -153,18 +138,14 @@ SearchSystemTimers(
     PTIMER_CALLBACK TimerCallback
 )
 {
-    /* For every processor in the system */
-    for (ULONG i = 0; i < KeNumberProcessors_0; i++)
-    {
-        /* Get the matching KPRCB struct (current code is wrong, just a placeholder) */
-        PKPRCB pPrcb = KeGetPcr()->CurrentPrcb;
+    /* Get the matching KPRCB struct (current code is wrong, just a placeholder) */
+    PKPRCB pPrcb = Globals::Functions::KeGetPrcb(0);
 
-        if (!pPrcb)
-            return FALSE;
+    if (!pPrcb)
+        return FALSE;
 
-        /* Get the KPRCB's TimerTable, then iterate its Timers */
-        SearchTimerTable(GetTimerTable(pPrcb), TimerCallback);
-    }
+    /* Get the KPRCB's TimerTable, then iterate its Timers */
+    SearchTimerTable(GetTimerTable(pPrcb), TimerCallback);
 
     return TRUE;
 }

@@ -1,7 +1,7 @@
 #include "../PatchGuard.h"
 #include "../timers/Timer.h"
 #include "../flows/Flows.h"
-#include "../../utils/Log.h"
+#include "../../utils/Log/Log.h"
 #include <ntddk.h>
 
 typedef struct _VERIFY_CONTEXT
@@ -37,12 +37,31 @@ VerifyTimer(
 }
 
 BOOLEAN
+VerifyPrcbDpc(
+    VOID
+)
+{
+    PKDPC *PrcbDpc = Flows::PrcbDpc::GetTargetDpc();
+
+    if (!PrcbDpc)
+        return FALSE;
+
+    if (!*PrcbDpc)
+        return FALSE;
+
+    return TRUE;
+}
+
+BOOLEAN
 PG::Verify::Execute(
     VOID
 )
 {
     /* Verify all PG related Timers exist */
     SearchSystemTimers(&VerifyTimer);
+
+    /* TODO: Not loving this global context variable */
+    g_VerifyContext.bPrcbDpc = VerifyPrcbDpc();
 
     return
         g_VerifyContext.bContextAwareTimer &&

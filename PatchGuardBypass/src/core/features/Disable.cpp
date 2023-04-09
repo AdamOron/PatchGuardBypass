@@ -1,7 +1,7 @@
 #include "../PatchGuard.h"
 #include "../timers/Timer.h"
 #include "../flows/Flows.h"
-#include "../../utils/Log.h"
+#include "../../utils/Log/Log.h"
 #include <ntddk.h>
 
 /**
@@ -31,15 +31,41 @@ RemoveTimer(
     return ContinueTimerSearch;
 }
 
+/**
+Removes the DPC stored in the Prcb structure, i.e. NULLs it.
+According to HalpMcaQueueDpc, a NULL DPC does not result in an error.
+*/
+BOOLEAN
+RemovePrcbDpc(
+    VOID
+)
+{
+    PKDPC *PrcbDpc = Flows::PrcbDpc::GetTargetDpc();
+    
+    if (!PrcbDpc)
+        return FALSE;
+
+    if (!*PrcbDpc)
+        return TRUE;
+
+    Log("Removed Prcb DPC: %p\n", *PrcbDpc);
+
+    *PrcbDpc = NULL;
+
+    return TRUE;
+}
+
 BOOLEAN
 PG::Disable::Execute(
 	VOID
 )
 {
-    /* Disable all PG related Timers */
+    /* Disable all PG related Timers (prevents ContextAware/Unaware flows) */
     SearchSystemTimers(&RemoveTimer);
 
-    /* Flows::PrcbDpc:: */
+    /* Remove DPC from Prcb (prevents Prcb DPC flow) */
+    if (!RemovePrcbDpc())
+        return FALSE;
 
     return TRUE;
 }

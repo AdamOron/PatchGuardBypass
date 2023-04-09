@@ -1,7 +1,7 @@
 #include "../PatchGuard.h"
 #include "../timers/Timer.h"
 #include "../flows/Flows.h"
-#include "../../utils/Log.h"
+#include "../../utils/Log/Log.h"
 #include <ntddk.h>
 
 /**
